@@ -14,6 +14,19 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+#IDE and editor
 .idea
+.vscode/*
+!.vscode/
+!.vscode/launch.json
+.DS_Store
+*/.DS_Store
+*.swp
 
+
+#Developer extra files
 TODO
+
+#Environment
+.env
+.env.test
