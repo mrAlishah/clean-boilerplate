@@ -3,6 +3,7 @@ package user
 import (
 	"boilerplate/core/infrastructures"
 	"boilerplate/core/interfaces"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -30,6 +31,8 @@ func (pr UserRoutes) Setup() {
 	g := pr.router.Gin.Group("/api/users")
 	{
 		g.GET("/", func(context *gin.Context) {
+			a := 0
+			fmt.Println(2 / a)
 			context.String(http.StatusOK, "Hello world")
 		})
 	}

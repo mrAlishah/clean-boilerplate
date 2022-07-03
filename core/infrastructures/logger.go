@@ -35,7 +35,7 @@ func NewLogger(env *Env) *Logger {
 	}
 
 	logger, _ := config.Build(zap.Hooks(func(entry zapcore.Entry) error {
-		if entry.Level == zapcore.ErrorLevel {
+		if entry.Level == zapcore.ErrorLevel || entry.Level == zapcore.FatalLevel {
 			defer sentry.Flush(2 * time.Second)
 			sentry.CaptureMessage(fmt.Sprintf("%s, Line No: %d :: %s", entry.Caller.File, entry.Caller.Line, entry.Message, entry.Stack))
 		}
