@@ -1,16 +1,30 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
+	"boilerplate/core"
+	"github.com/getsentry/sentry-go"
+	"github.com/joho/godotenv"
+	"go.uber.org/fx"
+	"log"
+	"os"
 )
 
 func main() {
-	http.HandleFunc("/", HelloServer)
-	fmt.Println(http.ListenAndServe(":8000", nil))
-}
-func HelloServer(w http.ResponseWriter, r *http.Request) {
-	name := "Hello world1"
-	fmt.Fprintf(w, name)
+	godotenv.Load()
 
+	err := sentry.Init(
+		sentry.ClientOptions{
+			Dsn:         os.Getenv("SentryDSN"),
+			Environment: os.Getenv("Environment"),
+			Release:     os.Getenv("AppName") + "@" + os.Getenv("Version"),
+			// Enable printing of SDK debug messages.
+			// Useful when getting started or trying to figure something out.
+			Debug: true,
+		},
+	)
+	if err != nil {
+		log.Fatal("failed to init sentry: ", err)
+		return
+	}
+	fx.New(core.BootstrapModule).Run()
 }

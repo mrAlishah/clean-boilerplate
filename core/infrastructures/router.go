@@ -9,7 +9,7 @@ type Router struct {
 	Gin *gin.Engine
 }
 
-func NewRouter(env Env) Router {
+func NewRouter(env *Env) *Router {
 	httpRouter := gin.Default()
 
 	httpRouter.Use(cors.New(cors.Config{
@@ -19,7 +19,7 @@ func NewRouter(env Env) Router {
 		AllowCredentials: true,
 	}))
 
-	return Router{
+	return &Router{
 		Gin: httpRouter,
 	}
 }

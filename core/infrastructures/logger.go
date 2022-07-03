@@ -26,7 +26,7 @@ func (l *Logger) Fatal(msg string, parameters ...interface{}) {
 }
 
 // NewLogger sets up logger
-func NewLogger(env Env) Logger {
+func NewLogger(env *Env) *Logger {
 
 	config := zap.NewDevelopmentConfig()
 
@@ -44,7 +44,7 @@ func NewLogger(env Env) Logger {
 
 	sugar := logger.Sugar()
 
-	return Logger{
+	return &Logger{
 		Zap: sugar,
 	}
 }
