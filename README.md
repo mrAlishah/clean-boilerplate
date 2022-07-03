@@ -1,2 +1,2 @@
-# Clean-Boiler-Plate
+# clean-boilerplate
 ClearBoilerPlate
