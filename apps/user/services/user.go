@@ -2,10 +2,12 @@ package services
 
 import (
 	repositories "boilerplate/apps/user/repositories/gorm"
+	errors2 "boilerplate/core/errors"
 	"boilerplate/core/infrastructures"
 	"boilerplate/core/interfaces"
 	"boilerplate/core/models"
 	"boilerplate/core/utils"
+	"errors"
 )
 
 // UserService -> struct
@@ -29,27 +31,35 @@ func NewUserService(userRepository *repositories.UserRepository,
 }
 
 // GetAllUser -> call to get all the User
-func (us UserService) GetAllUsers(pagination utils.Pagination) (users []models.User, count int64, err error) {
-	users, count, err = us.userRepository.GetAllUsers(pagination)
+func (s UserService) GetAllUsers(pagination utils.Pagination) (users []models.User, count int64, err error) {
+	users, count, err = s.userRepository.GetAllUsers(pagination)
 	if err != nil {
-		us.logger.Fatal("Failed to get users", err.Error())
+		s.logger.Fatal("Failed to get users", err.Error())
 		return
 	}
 	return
 }
 
-func (us UserService) CreateUser(userData models.CreateUserRequestAdmin) (err error) {
-	encryptedPassword := us.encryption.SaltAndSha256Encrypt(userData.Password)
+func (s UserService) CreateUser(userData models.CreateUserRequestAdmin) (err error) {
+	encryptedPassword := s.encryption.SaltAndSha256Encrypt(userData.Password)
 	user := models.User{
 		Password:  encryptedPassword,
 		FirstName: userData.FirstName,
 		LastName:  userData.LastName,
 		Email:     userData.Email,
 	}
-	err = us.userRepository.Create(&user)
+	err = s.userRepository.Create(&user)
 	if err != nil {
-		us.logger.Fatal("Failed to create user:%s", err.Error())
+		s.logger.Fatal("Failed to create user:%s", err.Error())
 		return
 	}
 	return
+}
+
+func (s UserService) DeleteUser(id uint64) (err error) {
+	err = s.userRepository.DeleteUser(id)
+	if !errors.Is(err, errors2.NotFoundError) && err != nil {
+		s.logger.Fatal("Failed to find user:%s", err.Error())
+	}
+	return err
 }

@@ -1,12 +1,12 @@
 package repositories
 
 import (
+	errors2 "boilerplate/core/errors"
 	"boilerplate/core/infrastructures"
 	"boilerplate/core/models"
 	"boilerplate/core/utils"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -29,7 +29,7 @@ func (r UserRepository) Create(User *models.User) error {
 	return r.db.DB.Create(User).Error
 }
 
-func (r UserRepository) FindByField(field string, value string) (user models.User, err error) {
+func (r UserRepository) FindByField(field string, value interface{}) (user models.User, err error) {
 	err = r.db.DB.Where(fmt.Sprintf("%s= ?", field), value).First(&user).Error
 	return
 }
@@ -76,7 +76,16 @@ func (r UserRepository) UpdateColumn(user *models.User, column string, value int
 	return r.db.DB.Model(user).Update(column, value).Error
 }
 
-func (r UserRepository) GetAuthenticatedUser(c *gin.Context) (models.User, error) {
-	userId := c.MustGet("userId").(string)
-	return r.FindByField("id", userId)
+func (r UserRepository) DeleteUser(id uint64) (err error) {
+	_, err = r.FindByField("id", id)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		err = errors2.NotFoundError
+		return
+	}
+	if err != nil {
+		return
+	}
+
+	err = r.DeleteByID(uint(id))
+	return
 }

@@ -33,5 +33,6 @@ func (pr UserRoutes) Setup() {
 	{
 		g.GET("/", pr.userController.ListUser)
 		g.POST("/", pr.userController.CreateUser)
+		g.DELETE("/:id", pr.userController.DeleteUser)
 	}
 }

@@ -7,8 +7,11 @@ import (
 	"boilerplate/core/models"
 	"boilerplate/core/responses"
 	"boilerplate/core/utils"
+	"errors"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"net/http"
+	"strconv"
 )
 
 type UserController struct {
@@ -82,6 +85,38 @@ func (uc UserController) CreateUser(c *gin.Context) {
 		responses.ErrorJSON(c, http.StatusInternalServerError, gin.H{}, "Sorry an error occurred!")
 	}
 	uc.paginateUserList(c, "User created successfully.")
+}
+
+// @Summary delete user
+// @Schemes
+// @Description delete user or admin , admin only
+// @Tags admin
+// @Accept json
+// @Produce json
+// @Param id path int true "user id"
+// @Success 200 {object} swagger.UsersListResponse
+// @failure 401 {object} swagger.UnauthenticatedResponse
+// @failure 404 {object} swagger.NotFoundResponse
+// @failure 403 {object} swagger.AccessForbiddenResponse
+// @Router /admin/users/{id} [delete]
+func (uc UserController) DeleteUser(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		responses.ErrorJSON(c, http.StatusNotFound, gin.H{}, "No user found")
+		return
+	}
+
+	err = uc.userService.DeleteUser(uint64(id))
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		responses.ErrorJSON(c, http.StatusNotFound, gin.H{}, "No user found")
+		return
+	}
+	if err != nil {
+		responses.ErrorJSON(c, http.StatusInternalServerError, gin.H{}, "An error occurred")
+		return
+	}
+
+	uc.paginateUserList(c, "User deleted successfully !")
 }
 
 func (uc *UserController) paginateUserList(c *gin.Context, message string) {
