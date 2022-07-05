@@ -1,5 +1,5 @@
 # Clean-Boiler-Plate
-ClearBoilerPlate
+CleanBoilerPlate
 
 ### features
 environment variables <br>
@@ -11,7 +11,9 @@ advanced test and mocking<br>
 responses and validators<br>
 
 
-### rules 
+### architecture and  rules
+![clean architecture](https://github.com/mahdimehrabi/clean-boilerplate/blob/main/architecture.png?raw=true)
+
 Errors log must handle in service<br>
 Errors response must handle controller<br>
 Never pass router framework instances like gin.Content to services and repositories<br>
