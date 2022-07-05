@@ -15,3 +15,4 @@ responses and validators<br>
 Errors log must handle in service
 Errors response must handle controller
 Never pass router framework instances like gin.Content to services and repositories
+Its so important that order be like Controller -> Service -> Repository
