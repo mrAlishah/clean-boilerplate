@@ -19,6 +19,9 @@ var BootstrapModule = fx.Options(
 	infrastructures.Module,
 	RoutesModule,
 	validators.Module,
+	ServiceModule,
+	RepositoryModule,
+	ControllerModule,
 	fx.Invoke(bootstrap),
 )
 

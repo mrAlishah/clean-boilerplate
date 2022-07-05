@@ -2,7 +2,6 @@ package models
 
 type User struct {
 	Base
-	IsAdmin   bool   `json:"-"`
 	Email     string `json:"email" binding:"required"`
 	FirstName string `json:"firstName" binding:"required"`
 	LastName  string `json:"lastName" binding:"required"`
@@ -12,16 +11,6 @@ type User struct {
 // TableName gives table name of model
 func (m User) TableName() string {
 	return "users"
-}
-
-// ToMap convert User to map
-func (m User) ToMap() map[string]interface{} {
-	return map[string]interface{}{
-		"Email":     m.Email,
-		"FirstName": m.FirstName,
-		"LastName":  m.LastName,
-		"IsAdmin":   m.IsAdmin,
-	}
 }
 
 func (u User) ToResponse() UserResponse {
@@ -55,7 +44,7 @@ type UserResponse struct {
 }
 
 type CreateUserRequestAdmin struct {
-	Email          string `json:"email" binding:"required,uniqueDB=users&email,email"`
+	Email          string `json:"email" binding:"required,uniqueGorm=users&email,email"`
 	FirstName      string `json:"firstName" binding:"required"`
 	LastName       string `json:"lastName" binding:"required"`
 	Password       string `json:"password" binding:"required"`

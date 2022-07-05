@@ -10,9 +10,9 @@ func MsgForTag(tag string, fieldName string, param string) string {
 		return "This field is required"
 	case "email":
 		return "Please enter a valid email like example@example.com"
-	case "uniqueDB":
+	case "uniqueGorm":
 		return fmt.Sprintf("Entered %s is already exist", fieldName)
-	case "fkDB":
+	case "fkGorm":
 		return fmt.Sprintf("Entered %s doesn't exist", fieldName)
 	case "numeric":
 		return "You must use numeric value for this field"

@@ -1,17 +1,16 @@
 package user
 
 import (
+	"boilerplate/apps/user/controllers"
 	"boilerplate/core/infrastructures"
 	"boilerplate/core/interfaces"
-	"fmt"
-	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 // UserRoutes -> utility routes struct
 type UserRoutes struct {
-	router *infrastructures.Router
-	Logger interfaces.Logger
+	router         *infrastructures.Router
+	logger         interfaces.Logger
+	userController *controllers.UserController
 }
 
 //NewProfileRoute -> returns new utility route
@@ -19,10 +18,12 @@ func NewUserRoutes(
 	logger *infrastructures.Logger,
 	env *infrastructures.Env,
 	router *infrastructures.Router,
+	userController *controllers.UserController,
 ) UserRoutes {
 	return UserRoutes{
-		Logger: logger,
-		router: router,
+		logger:         logger,
+		router:         router,
+		userController: userController,
 	}
 }
 
@@ -30,10 +31,7 @@ func NewUserRoutes(
 func (pr UserRoutes) Setup() {
 	g := pr.router.Gin.Group("/api/users")
 	{
-		g.GET("/", func(context *gin.Context) {
-			a := 0
-			fmt.Println(5 / a)
-			context.String(http.StatusOK, "Hello world")
-		})
+		g.GET("/", pr.userController.ListUser)
+		g.POST("/", pr.userController.CreateUser)
 	}
 }

@@ -10,25 +10,45 @@ import (
 
 // UserService -> struct
 type UserService struct {
-	repositories repositories.UserRepository
-	db           infrastructures.GormDB
-	logger       interfaces.Logger
+	userRepository *repositories.UserRepository
+	db             *infrastructures.GormDB
+	logger         interfaces.Logger
+	encryption     *infrastructures.Encryption
 }
 
 // NewUserService -> creates a new Userservice
-func NewUserService(repositories repositories.UserRepository, db infrastructures.GormDB, logger *infrastructures.Logger) UserService {
-	return UserService{
-		repositories: repositories,
-		db:           db,
-		logger:       logger,
+func NewUserService(userRepository *repositories.UserRepository,
+	db *infrastructures.GormDB, logger *infrastructures.Logger,
+	encryption *infrastructures.Encryption) *UserService {
+	return &UserService{
+		userRepository: userRepository,
+		db:             db,
+		logger:         logger,
+		encryption:     encryption,
 	}
 }
 
 // GetAllUser -> call to get all the User
 func (us UserService) GetAllUsers(pagination utils.Pagination) (users []models.User, count int64, err error) {
-	users, count, err = us.repositories.GetAllUsers(pagination)
+	users, count, err = us.userRepository.GetAllUsers(pagination)
 	if err != nil {
 		us.logger.Fatal("Failed to get users", err.Error())
+		return
+	}
+	return
+}
+
+func (us UserService) CreateUser(userData models.CreateUserRequestAdmin) (err error) {
+	encryptedPassword := us.encryption.SaltAndSha256Encrypt(userData.Password)
+	user := models.User{
+		Password:  encryptedPassword,
+		FirstName: userData.FirstName,
+		LastName:  userData.LastName,
+		Email:     userData.Email,
+	}
+	err = us.userRepository.Create(&user)
+	if err != nil {
+		us.logger.Fatal("Failed to create user:%s", err.Error())
 		return
 	}
 	return
