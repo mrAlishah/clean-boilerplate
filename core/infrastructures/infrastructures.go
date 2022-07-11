@@ -6,4 +6,6 @@ var Module = fx.Options(
 	fx.Provide(NewEnv),
 	fx.Provide(NewRouter),
 	fx.Provide(NewLogger),
+	fx.Provide(NewGormDB),
+	fx.Provide(NewEncryption),
 )

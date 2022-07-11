@@ -2,6 +2,8 @@ package core
 
 import (
 	"boilerplate/core/infrastructures"
+	"boilerplate/core/responses"
+	"boilerplate/core/responses/validators"
 	"context"
 	"fmt"
 	"net/http"
@@ -16,6 +18,10 @@ import (
 var BootstrapModule = fx.Options(
 	infrastructures.Module,
 	RoutesModule,
+	validators.Module,
+	ServiceModule,
+	RepositoryModule,
+	ControllerModule,
 	fx.Invoke(bootstrap),
 )
 
@@ -24,6 +30,7 @@ func bootstrap(lifecycle fx.Lifecycle,
 	router *infrastructures.Router,
 	env *infrastructures.Env,
 	routes Routes,
+	validators validators.Validators,
 ) {
 	//recover unwanted 500 errors
 	router.Gin.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
@@ -38,7 +45,7 @@ func bootstrap(lifecycle fx.Lifecycle,
 			default:
 				logger.Warning("recovered (default) panic:", e)
 			}
-			//responses.ErrorJSON(c, http.StatusInternalServerError, gin.H{}, "Sorry an error occured!")
+			responses.ErrorJSON(c, http.StatusInternalServerError, gin.H{}, "Sorry an error occured!")
 			return
 		}
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -56,7 +63,7 @@ func bootstrap(lifecycle fx.Lifecycle,
 			logger.Info(fmt.Sprintf("------ %s  ------", env.AppName))
 			logger.Info("------------------------")
 			go func() {
-				//validators.Setup()
+				validators.Setup()
 				routes.Setup()
 				//docs.SwaggerInfo.BasePath = "/api"
 				//router.Gin.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
