@@ -1,6 +1,7 @@
 package services
 
 import (
+	"boilerplate/apps/user/DTO"
 	repositories "boilerplate/apps/user/repositories/gorm"
 	errors2 "boilerplate/core/errors"
 	"boilerplate/core/infrastructures"
@@ -40,8 +41,8 @@ func (s UserService) GetAllUsers(pagination utils.Pagination) (users []models.Us
 	return
 }
 
-func (s UserService) CreateUser(userData models.CreateUserRequestAdmin) (err error) {
-	encryptedPassword := s.encryption.SaltAndSha256Encrypt(userData.Password)
+func (s UserService) CreateUser(userData DTO.CreateUserRequestAdmin) (err error) {
+	encryptedPassword := s.encryption.SaltAndSha256Encrypt(userData.Password, userData.Email)
 	user := models.User{
 		Password:  encryptedPassword,
 		FirstName: userData.FirstName,
@@ -60,6 +61,7 @@ func (s UserService) DeleteUser(id uint64) (err error) {
 	err = s.userRepository.DeleteUser(id)
 	if !errors.Is(err, errors2.NotFoundError) && err != nil {
 		s.logger.Fatal("Failed to find user:%s", err.Error())
+		return err
 	}
 	return err
 }
