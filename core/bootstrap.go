@@ -56,12 +56,14 @@ func bootstrap(lifecycle fx.Lifecycle,
 		Repanic: true,
 	}))
 
+	fmt.Println("xxxxxxvsdgfgds")
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			logger.Info("Starting Application🔥💝😈")
 			logger.Info("------------------------")
 			logger.Info(fmt.Sprintf("------ %s  ------", env.AppName))
 			logger.Info("------------------------")
+			fmt.Println(env.ServerPort)
 			go func() {
 				validators.Setup()
 				routes.Setup()

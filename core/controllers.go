@@ -7,4 +7,5 @@ import (
 
 var ControllerModule = fx.Options(
 	fx.Provide(controllers.NewUserController),
+	fx.Provide(controllers.NewAuthController),
 )

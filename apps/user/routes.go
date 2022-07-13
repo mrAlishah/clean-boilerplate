@@ -11,6 +11,7 @@ type UserRoutes struct {
 	router         *infrastructures.Router
 	logger         interfaces.Logger
 	userController *controllers.UserController
+	authController *controllers.AuthController
 }
 
 //NewProfileRoute -> returns new utility route
@@ -19,11 +20,13 @@ func NewUserRoutes(
 	env *infrastructures.Env,
 	router *infrastructures.Router,
 	userController *controllers.UserController,
+	authController *controllers.AuthController,
 ) UserRoutes {
 	return UserRoutes{
 		logger:         logger,
 		router:         router,
 		userController: userController,
+		authController: authController,
 	}
 }
 
@@ -35,4 +38,12 @@ func (pr UserRoutes) Setup() {
 		g.POST("/", pr.userController.CreateUser)
 		g.DELETE("/:id", pr.userController.DeleteUser)
 	}
+
+	a := pr.router.Gin.Group("/api/auth")
+	{
+		a.POST("/login", pr.authController.Login)
+		a.POST("/access-token-verify", pr.authController.AccessTokenVerify)
+		a.POST("/renew-access-token", pr.authController.RenewToken)
+	}
+
 }
