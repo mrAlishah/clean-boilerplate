@@ -8,6 +8,7 @@ import (
 	"boilerplate/core/interfaces"
 	"boilerplate/core/models"
 	"boilerplate/core/responses"
+	"boilerplate/core/utils"
 	"errors"
 	"net/http"
 	"strconv"
@@ -59,41 +60,41 @@ func NewAuthController(
 // @Success 200 {object} swagger.SuccessResponse
 // @failure 422 {object} swagger.FailedValidationResponse
 // @Router /auth/register [post]
-//func (ac AuthController) Register(c *gin.Context) {
-//
-//	// Data Parse
-//	var userData DTO.RegisterRequest
-//	if err := c.ShouldBindJSON(&userData); err != nil {
-//		fieldErrors := make(map[string]string, 0)
-//		if !utils.IsGoodPassword(userData.Password) {
-//			fieldErrors["password"] = "Password must contain at least one alphabet and one number and its length must be 8 characters or more"
-//
-//		}
-//		responses.ValidationErrorsJSON(c, err, "", fieldErrors)
-//		return
-//	}
-//	if !utils.IsGoodPassword(userData.Password) {
-//		fieldErrors := map[string]string{
-//			"password": "Password must contain at least one alphabet and one number and its length must be 8 characters or more",
-//		}
-//		responses.ManualValidationErrorsJSON(c, fieldErrors, "")
-//		return
-//	}
-//	var user models.User
-//	encryptedPassword := ac.encryption.SaltAndSha256Encrypt(userData.Password, userData.Email)
-//	user.Password = encryptedPassword
-//
-//	user.FirstName = userData.FirstName
-//	user.LastName = userData.LastName
-//	user.Email = userData.Email
-//	err := ac.userService.CreateUser(&userData)
-//	if err != nil {
-//		ac.logger.Zap.Error("Failed to create registered user ", err.Error())
-//		responses.ErrorJSON(c, http.StatusInternalServerError, gin.H{}, "Sorry an error occurred in registering your account!")
-//		return
-//	}
-//	responses.JSON(c, http.StatusOK, gin.H{}, "Your account created successfully, an verification link sent to your email use that to verify your account")
-//}
+func (ac AuthController) Register(c *gin.Context) {
+
+	// Data Parse
+	var userData DTO.RegisterRequest
+	if err := c.ShouldBindJSON(&userData); err != nil {
+		fieldErrors := make(map[string]string, 0)
+		if !utils.IsGoodPassword(userData.Password) {
+			fieldErrors["password"] = "Password must contain at least one alphabet and one number and its length must be 8 characters or more"
+
+		}
+		responses.ValidationErrorsJSON(c, err, "", fieldErrors)
+		return
+	}
+	if !utils.IsGoodPassword(userData.Password) {
+		fieldErrors := map[string]string{
+			"password": "Password must contain at least one alphabet and one number and its length must be 8 characters or more",
+		}
+		responses.ManualValidationErrorsJSON(c, fieldErrors, "")
+		return
+	}
+	var user models.User
+	encryptedPassword := ac.encryption.SaltAndSha256Encrypt(userData.Password, userData.Email)
+	user.Password = encryptedPassword
+
+	user.FirstName = userData.FirstName
+	user.LastName = userData.LastName
+	user.Email = userData.Email
+	err := ac.userRepository.Create(&user)
+	if err != nil {
+		ac.logger.Fatal("Failed to create registered user ", err.Error())
+		responses.ErrorJSON(c, http.StatusInternalServerError, gin.H{}, "Sorry an error occurred in registering your account!")
+		return
+	}
+	responses.JSON(c, http.StatusOK, gin.H{}, "Your account created successfully, an verification link sent to your email use that to verify your account")
+}
 
 // @Summary login
 // @Schemes
@@ -110,13 +111,13 @@ func NewAuthController(
 // @Router /auth/login [post]
 func (ac AuthController) Login(c *gin.Context) {
 	// Data Parse
-	var loginRquest DTO.LoginRequest
-	if err := c.ShouldBindJSON(&loginRquest); err != nil {
+	var loginRequest DTO.LoginRequest
+	if err := c.ShouldBindJSON(&loginRequest); err != nil {
 		responses.ValidationErrorsJSON(c, err, "", map[string]string{})
 		return
 	}
 	var user models.User
-	user, err := ac.userRepository.FindByField("Email", loginRquest.Email)
+	user, err := ac.userRepository.FindByField("Email", loginRequest.Email)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		responses.ErrorJSON(c, http.StatusUnauthorized, gin.H{}, "No user found with entered credentials")
 		return
@@ -126,7 +127,7 @@ func (ac AuthController) Login(c *gin.Context) {
 		responses.ErrorJSON(c, http.StatusInternalServerError, gin.H{}, "An error occured")
 		return
 	}
-	encryptedPassword := ac.encryption.SaltAndSha256Encrypt(loginRquest.Password, loginRquest.Email)
+	encryptedPassword := ac.encryption.SaltAndSha256Encrypt(loginRequest.Password, loginRequest.Email)
 	if user.Password == encryptedPassword {
 		tokensData, err := ac.authService.CreateTokens(user)
 		if err != nil {

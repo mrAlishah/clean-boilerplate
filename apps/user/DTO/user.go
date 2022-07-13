@@ -17,10 +17,11 @@ func UsersToResponses(users []models.User) []UserResponse {
 
 type RegisterRequest struct {
 	models.BaseResponse
-	Email     string `json:"email"`
-	FirstName string `json:"firstName" binding:"required"`
-	LastName  string `json:"lastName" binding:"required"`
-	Password  string `json:"-"`
+	Email          string `json:"email" binding:"required"`
+	FirstName      string `json:"firstName" binding:"required"`
+	LastName       string `json:"lastName" binding:"required"`
+	Password       string `json:"password" binding:"required"`
+	RepeatPassword string `json:"repeatPassword" binding:"required,eqfield=Password"`
 }
 
 type UserResponse struct {

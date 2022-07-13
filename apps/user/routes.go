@@ -42,6 +42,7 @@ func (pr UserRoutes) Setup() {
 	a := pr.router.Gin.Group("/api/auth")
 	{
 		a.POST("/login", pr.authController.Login)
+		a.POST("/register", pr.authController.Register)
 		a.POST("/access-token-verify", pr.authController.AccessTokenVerify)
 		a.POST("/renew-access-token", pr.authController.RenewToken)
 	}
