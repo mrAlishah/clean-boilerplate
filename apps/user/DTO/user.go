@@ -16,8 +16,7 @@ func UsersToResponses(users []models.User) []UserResponse {
 }
 
 type RegisterRequest struct {
-	models.BaseResponse
-	Email          string `json:"email" binding:"required"`
+	Email          string `json:"email" binding:"required,uniqueGorm=users&email,email"`
 	FirstName      string `json:"firstName" binding:"required"`
 	LastName       string `json:"lastName" binding:"required"`
 	Password       string `json:"password" binding:"required"`
@@ -40,9 +39,6 @@ func (r *UserResponse) FromModel(userModel models.User) {
 }
 
 func (r *RegisterRequest) ToModel(encryption infrastructures.Encryption, m models.User) {
-	r.BaseResponse.ID = m.ID
-	r.BaseResponse.CreatedAt = m.Base.CreatedAt.Unix()
-	r.BaseResponse.UpdatedAt = m.Base.CreatedAt.Unix()
 	r.Email = m.Email
 	r.FirstName = m.FirstName
 	r.LastName = m.LastName
