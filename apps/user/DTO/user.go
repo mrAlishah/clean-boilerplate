@@ -32,6 +32,9 @@ type UserResponse struct {
 }
 
 func (r *UserResponse) FromModel(userModel models.User) {
+	r.ID = userModel.ID
+	r.CreatedAt = userModel.CreatedAt.Unix()
+	r.UpdatedAt = userModel.UpdatedAt.Unix()
 	r.Email = userModel.Email
 	r.FirstName = userModel.FirstName
 	r.LastName = userModel.LastName
