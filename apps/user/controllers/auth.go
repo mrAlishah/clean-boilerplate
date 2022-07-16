@@ -4,9 +4,9 @@ import (
 	"boilerplate/apps/user/DTO"
 	repositories "boilerplate/apps/user/repositories/gorm"
 	"boilerplate/apps/user/services"
+	errors2 "boilerplate/core/errors"
 	"boilerplate/core/infrastructures"
 	"boilerplate/core/interfaces"
-	"boilerplate/core/models"
 	"boilerplate/core/responses"
 	"boilerplate/core/utils"
 	"errors"
@@ -107,40 +107,28 @@ func (ac AuthController) Login(c *gin.Context) {
 		responses.ValidationErrorsJSON(c, err, "", map[string]string{})
 		return
 	}
-	var user models.User
-	user, err := ac.userRepository.FindByField("Email", loginRequest.Email)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
+
+	user, tokensData, err := ac.authService.Login(loginRequest)
+	if errors.Is(err, errors2.NotFoundError) {
 		responses.ErrorJSON(c, http.StatusUnauthorized, gin.H{}, "No user found with entered credentials")
 		return
 	}
 	if err != nil {
-		ac.logger.Fatal("Error to find user:%s", err.Error())
 		responses.ErrorJSON(c, http.StatusInternalServerError, gin.H{}, "An error occured")
 		return
 	}
-	encryptedPassword := ac.encryption.SaltAndSha256Encrypt(loginRequest.Password, loginRequest.Email)
-	if user.Password == encryptedPassword {
-		tokensData, err := ac.authService.CreateTokens(user)
-		if err != nil {
-			ac.logger.Fatal("Failed generate jwt tokens:%s", err.Error())
-			responses.ErrorJSON(c, http.StatusInternalServerError, gin.H{}, "An error occured")
-			return
-		}
-		var loginResult DTO.LoginResponse
-		loginResult.AccessToken = tokensData["accessToken"]
-		loginResult.RefreshToken = tokensData["refreshToken"]
-		loginResult.ExpRefreshToken = tokensData["expRefreshToken"]
-		loginResult.ExpAccessToken = tokensData["expAccessToken"]
-		var userResponse DTO.UserResponse
-		userResponse.FromModel(user)
-		loginResult.User = userResponse
 
-		responses.JSON(c, http.StatusOK, loginResult, "Hello "+user.FirstName+" wellcome back")
-		return
-	} else {
-		responses.ErrorJSON(c, http.StatusUnauthorized, gin.H{}, "No user found with entered credentials")
-		return
-	}
+	var loginResult DTO.LoginResponse
+	loginResult.AccessToken = tokensData["accessToken"]
+	loginResult.RefreshToken = tokensData["refreshToken"]
+	loginResult.ExpRefreshToken = tokensData["expRefreshToken"]
+	loginResult.ExpAccessToken = tokensData["expAccessToken"]
+	var userResponse DTO.UserResponse
+	userResponse.FromModel(user)
+	loginResult.User = userResponse
+	responses.JSON(c, http.StatusOK, loginResult, "Hello "+user.FirstName+" wellcome back")
+	return
+
 }
 
 // @Summary access token verify

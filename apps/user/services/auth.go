@@ -3,11 +3,13 @@ package services
 import (
 	"boilerplate/apps/user/DTO"
 	repositories "boilerplate/apps/user/repositories/gorm"
+	errors2 "boilerplate/core/errors"
 	"boilerplate/core/infrastructures"
 	"boilerplate/core/interfaces"
 	"boilerplate/core/models"
 	"errors"
 	"github.com/golang-jwt/jwt"
+	"gorm.io/gorm"
 	"os"
 	"strconv"
 	"time"
@@ -118,4 +120,28 @@ func (s AuthService) CreateUser(userData DTO.RegisterRequest) (err error) {
 		return
 	}
 	return
+}
+
+func (s AuthService) Login(loginRequest DTO.LoginRequest) (user models.User, tokensData map[string]string, err error) {
+	user, err = s.userRepository.FindByField("Email", loginRequest.Email)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		err = errors2.NotFoundError
+		return
+	}
+	if err != nil {
+		s.logger.Fatal("Error to find user:%s", err.Error())
+		return
+	}
+
+	encryptedPassword := s.encryption.SaltAndSha256Encrypt(loginRequest.Password, loginRequest.Email)
+	if user.Password == encryptedPassword {
+		tokensData, err = s.CreateTokens(user)
+		if err != nil {
+			s.logger.Fatal("Failed generate jwt tokens:%s", err.Error())
+			return
+		}
+		return
+	} else {
+		return
+	}
 }
