@@ -1,0 +1,464 @@
+definitions:
+  DTO.AccessTokenRes:
+    properties:
+      accessToken:
+        type: string
+      expAccessToken:
+        type: string
+    required:
+    - accessToken
+    - expAccessToken
+    type: object
+  DTO.LoginResponse:
+    properties:
+      accessToken:
+        type: string
+      expAccessToken:
+        type: string
+      expRefreshToken:
+        type: string
+      refreshToken:
+        type: string
+      user:
+        $ref: '#/definitions/DTO.UserResponse'
+    type: object
+  DTO.UserResponse:
+    properties:
+      createdAt:
+        type: integer
+      email:
+        type: string
+      firstName:
+        type: string
+      id:
+        type: integer
+      lastName:
+        type: string
+      updatedAt:
+        type: integer
+    required:
+    - firstName
+    - lastName
+    type: object
+  swagger.AccessForbiddenResponse:
+    properties:
+      data:
+        $ref: '#/definitions/swagger.EmptyData'
+      msg:
+        example: Sorry you don't have access to visit this page!
+        type: string
+      ok:
+        example: false
+        type: boolean
+    type: object
+  swagger.EmptyData:
+    type: object
+  swagger.FailedLoginResponse:
+    properties:
+      data:
+        $ref: '#/definitions/swagger.EmptyData'
+      msg:
+        example: No user found with entered credentials
+        type: string
+      ok:
+        example: false
+        type: boolean
+    type: object
+  swagger.FailedResponse:
+    properties:
+      data:
+        $ref: '#/definitions/swagger.EmptyData'
+      msg:
+        example: Error or warnnig message
+        type: string
+      ok:
+        example: false
+        type: boolean
+    type: object
+  swagger.FailedValidationResponse:
+    properties:
+      data:
+        $ref: '#/definitions/swagger.validationErrors'
+      msg:
+        example: Please review your entered data
+        type: string
+      ok:
+        example: false
+        type: boolean
+    type: object
+  swagger.LoginResponse:
+    properties:
+      data:
+        $ref: '#/definitions/DTO.LoginResponse'
+      msg:
+        example: Successful message
+        type: string
+      ok:
+        example: true
+        type: boolean
+    type: object
+  swagger.NotFoundResponse:
+    properties:
+      data:
+        $ref: '#/definitions/swagger.EmptyData'
+      msg:
+        example: 404 not found!
+        type: string
+      ok:
+        example: false
+        type: boolean
+    type: object
+  swagger.PaginateUsersData:
+    properties:
+      count:
+        example: 10
+        type: integer
+      list:
+        items:
+          $ref: '#/definitions/DTO.UserResponse'
+        type: array
+    type: object
+  swagger.PingResponse:
+    properties:
+      data:
+        additionalProperties:
+          type: string
+        example:
+          pingpong: "\U0001F3D3\U0001F3D3\U0001F3D3\U0001F3D3\U0001F3D3\U0001F3D3"
+        type: object
+      msg:
+        example: pong
+        type: string
+      ok:
+        example: true
+        type: boolean
+    type: object
+  swagger.SuccessResponse:
+    properties:
+      data:
+        $ref: '#/definitions/swagger.EmptyData'
+      msg:
+        example: Successful message
+        type: string
+      ok:
+        example: true
+        type: boolean
+    type: object
+  swagger.SuccessVerifyAccessTokenResponse:
+    properties:
+      data:
+        $ref: '#/definitions/DTO.AccessTokenRes'
+      msg:
+        example: Successful message
+        type: string
+      ok:
+        example: true
+        type: boolean
+    type: object
+  swagger.UnauthenticatedResponse:
+    properties:
+      data:
+        $ref: '#/definitions/swagger.EmptyData'
+      msg:
+        example: You must login first!
+        type: string
+      ok:
+        example: false
+        type: boolean
+    type: object
+  swagger.UsersListResponse:
+    properties:
+      data:
+        $ref: '#/definitions/swagger.PaginateUsersData'
+      msg:
+        example: Successful message
+        type: string
+      ok:
+        example: true
+        type: boolean
+    type: object
+  swagger.validationErrors:
+    properties:
+      errors:
+        additionalProperties:
+          type: string
+        example:
+          field1: This field is required
+          field2: This field must be numeric
+        type: object
+    type: object
+info:
+  contact: {}
+paths:
+  /admin/users:
+    post:
+      consumes:
+      - application/json
+      description: create user and admin , admin only
+      parameters:
+      - description: unique email
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: 'password that have at least 8 length and contain an alphabet
+          and number '
+        in: formData
+        name: password
+        required: true
+        type: string
+      - description: 'repeatPassword that have at least 8 length and contain an alphabet
+          and number '
+        in: formData
+        name: repeatPassword
+        required: true
+        type: string
+      - description: firstName
+        in: formData
+        name: firstName
+        required: true
+        type: string
+      - description: lastName
+        in: formData
+        name: lastName
+        required: true
+        type: string
+      - description: isAdmin
+        in: formData
+        name: isAdmin
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/swagger.UsersListResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/swagger.UnauthenticatedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/swagger.AccessForbiddenResponse'
+      summary: create users
+      tags:
+      - admin
+  /admin/users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete user or admin , admin only
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/swagger.UsersListResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/swagger.UnauthenticatedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/swagger.AccessForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/swagger.NotFoundResponse'
+      summary: delete user
+      tags:
+      - admin
+  /auth/access-token-verify:
+    post:
+      consumes:
+      - application/json
+      description: jwt access token verify
+      parameters:
+      - description: accessToken
+        in: query
+        name: accessToken
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/swagger.SuccessResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/swagger.FailedResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/swagger.FailedValidationResponse'
+      summary: access token verify
+      tags:
+      - auth
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: jwt login
+      parameters:
+      - description: email
+        in: query
+        name: email
+        required: true
+        type: string
+      - description: send user operating system + browser name in this param
+        in: query
+        name: deviceName
+        required: true
+        type: string
+      - description: password
+        in: query
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/swagger.LoginResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/swagger.FailedLoginResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/swagger.FailedValidationResponse'
+      summary: login
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: jwt register
+      parameters:
+      - description: unique email
+        in: query
+        name: email
+        required: true
+        type: string
+      - description: 'password that have at least 8 length and contain an alphabet
+          and number '
+        in: query
+        name: password
+        required: true
+        type: string
+      - description: 'repeatPassword that have at least 8 length and contain an alphabet
+          and number '
+        in: query
+        name: repeatPassword
+        required: true
+        type: string
+      - description: firstName
+        in: query
+        name: firstName
+        required: true
+        type: string
+      - description: lastName
+        in: query
+        name: lastName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/swagger.SuccessResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/swagger.FailedValidationResponse'
+      summary: register
+      tags:
+      - auth
+  /auth/renew-access-token:
+    post:
+      consumes:
+      - application/json
+      description: jwt renew access token
+      parameters:
+      - description: refreshToken
+        in: query
+        name: refreshToken
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/swagger.SuccessVerifyAccessTokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/swagger.FailedResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/swagger.FailedValidationResponse'
+      summary: renew access token
+      tags:
+      - auth
+  /ping:
+    get:
+      consumes:
+      - application/json
+      description: do ping
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/swagger.PingResponse'
+      summary: ping
+      tags:
+      - generic
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: list of paginated response , authentication required
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/swagger.UsersListResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/swagger.UnauthenticatedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/swagger.AccessForbiddenResponse'
+      summary: get users list
+      tags:
+      - admin
+swagger: "2.0"
