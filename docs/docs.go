@@ -212,13 +212,6 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "send user operating system + browser name in this param",
-                        "name": "deviceName",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
                         "description": "password",
                         "name": "password",
                         "in": "query",

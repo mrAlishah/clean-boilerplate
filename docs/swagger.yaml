@@ -319,11 +319,6 @@ paths:
         name: email
         required: true
         type: string
-      - description: send user operating system + browser name in this param
-        in: query
-        name: deviceName
-        required: true
-        type: string
       - description: password
         in: query
         name: password

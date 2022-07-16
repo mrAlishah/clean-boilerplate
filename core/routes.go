@@ -23,11 +23,11 @@ type Route interface {
 
 // NewRoutes sets up routes
 func NewRoutes(
-	//userRoutes user.UserRoutes,
+	userRoutes user.UserRoutes,
 	genericRoutes genericApp.GenericRoutes,
 ) Routes {
 	return Routes{
-		//userRoutes,
+		userRoutes,
 		genericRoutes,
 	}
 }
