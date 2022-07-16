@@ -19,6 +19,26 @@ func (r *UserRepository) Create(user *models.User) error {
 	return r.CreateFn(user)
 }
 
-func (r *UserRepository) FindByField() {
+func (r *UserRepository) FindByField(field string, value interface{}) (user models.User, err error) {
+	return r.FindByFieldFn(field, value)
+}
 
+func (r *UserRepository) DeleteByID(id uint) error {
+	return r.DeleteByID(id)
+}
+
+func (r *UserRepository) IsExist(field string, value string) (bool, error) {
+	return r.IsExistFn(field, value)
+}
+
+func (r *UserRepository) GetAllUser(pagination utils.Pagination) ([]models.User, int64, error) {
+	return r.GetAllUsersFn(pagination)
+}
+
+func (r *UserRepository) UpdateColumn(user *models.User, column string, value interface{}) error {
+	return r.UpdateColumnFn(user, column, value)
+}
+
+func (r *UserRepository) DeleteUser(id uint64) (err error) {
+	return r.DeleteUserFn(id)
 }
