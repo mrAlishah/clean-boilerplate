@@ -22,10 +22,10 @@ import (
 type AuthController struct {
 	logger         interfaces.Logger
 	env            *infrastructures.Env
-	encryption     *infrastructures.Encryption
 	userService    *services.UserService
 	authService    *services.AuthService
 	userRepository *repositories.UserRepository
+	encryption     *infrastructures.Encryption
 }
 
 func NewAuthController(
@@ -37,10 +37,10 @@ func NewAuthController(
 ) *AuthController {
 	return &AuthController{
 		env:            env,
-		encryption:     encryption,
 		userService:    userService,
 		authService:    authService,
 		userRepository: userRepository,
+		encryption:     encryption,
 	}
 }
 
@@ -80,16 +80,8 @@ func (ac AuthController) Register(c *gin.Context) {
 		responses.ManualValidationErrorsJSON(c, fieldErrors, "")
 		return
 	}
-	var user models.User
-	encryptedPassword := ac.encryption.SaltAndSha256Encrypt(userData.Password, userData.Email)
-	user.Password = encryptedPassword
-
-	user.FirstName = userData.FirstName
-	user.LastName = userData.LastName
-	user.Email = userData.Email
-	err := ac.userRepository.Create(&user)
+	err := ac.authService.CreateUser(userData)
 	if err != nil {
-		ac.logger.Fatal("Failed to create registered user ", err.Error())
 		responses.ErrorJSON(c, http.StatusInternalServerError, gin.H{}, "Sorry an error occurred in registering your account!")
 		return
 	}
