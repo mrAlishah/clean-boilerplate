@@ -13,14 +13,13 @@ import (
 
 // UserService -> struct
 type UserService struct {
-	userRepository *repositories.UserRepository
+	userRepository interfaces.UserRepository
 	db             *infrastructures.GormDB
 	logger         interfaces.Logger
 	encryption     *infrastructures.Encryption
 }
 
-// NewUserService -> creates a new Userservice
-func NewUserService(userRepository *repositories.UserRepository,
+func NewUserService(userRepository interfaces.UserRepository,
 	db *infrastructures.GormDB, logger *infrastructures.Logger,
 	encryption *infrastructures.Encryption) *UserService {
 	return &UserService{
@@ -29,6 +28,13 @@ func NewUserService(userRepository *repositories.UserRepository,
 		logger:         logger,
 		encryption:     encryption,
 	}
+}
+
+// FxNewUserService -> creates a new Userservice
+func FxNewUserService(userRepository *repositories.UserRepository,
+	db *infrastructures.GormDB, logger *infrastructures.Logger,
+	encryption *infrastructures.Encryption) *UserService {
+	return NewUserService(userRepository, db, logger, encryption)
 }
 
 // GetAllUser -> call to get all the User
@@ -58,7 +64,7 @@ func (s UserService) CreateUser(userData DTO.CreateUserRequestAdmin) (err error)
 }
 
 func (s UserService) DeleteUser(id uint64) (err error) {
-	err = s.userRepository.DeleteUser(id)
+	err = s.userRepository.DeleteByID(uint(id))
 	if !errors.Is(err, errors2.NotFoundError) && err != nil {
 		s.logger.Fatal("Failed to find user:%s", err.Error())
 		return err
