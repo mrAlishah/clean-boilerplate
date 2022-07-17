@@ -1,8 +1,8 @@
 package mocks
 
 import (
-	"boilerplate/core/infrastructures"
 	"boilerplate/core/models"
+	"boilerplate/core/models/faker"
 	"boilerplate/core/utils"
 )
 
@@ -32,7 +32,7 @@ func (r *UserRepository) IsExist(field string, value string) (bool, error) {
 	return r.IsExistFn(field, value)
 }
 
-func (r *UserRepository) GetAllUser(pagination utils.Pagination) ([]models.User, int64, error) {
+func (r *UserRepository) GetAllUsers(pagination utils.Pagination) ([]models.User, int64, error) {
 	return r.GetAllUsersFn(pagination)
 }
 
@@ -44,21 +44,26 @@ func (r *UserRepository) DeleteUser(id uint64) (err error) {
 	return r.DeleteUserFn(id)
 }
 
-func NewUserRepository() UserRepository {
-	env := infrastructures.NewEnv()
-	logger := infrastructures.NewLogger(env)
-	encryption := infrastructures.NewEncryption(logger, env)
-	return UserRepository{
+func NewUserRepository() *UserRepository {
+	userFaker := faker.User{}
+	return &UserRepository{
 		CreateFn: func(user *models.User) error {
 			return nil
 		},
 		FindByFieldFn: func(field string, value interface{}) (user models.User, err error) {
-			return models.User{
-				FirstName: "dgsgd",
-				LastName:  "dsgdssdg",
-				Email:     "mahdi@gmail.com",
-				Password:  encryption.SaltAndSha256Encrypt("m1234567", "m12345567"),
-			}, err
+			return userFaker.CreateOne(), nil
+		},
+		DeleteByIDFn: func(id uint) error {
+			return nil
+		},
+		UpdateColumnFn: func(user *models.User, column string, value interface{}) error {
+			return nil
+		},
+		IsExistFn: func(field string, value string) (bool, error) {
+			return true, nil
+		},
+		GetAllUsersFn: func(pagination utils.Pagination) ([]models.User, int64, error) {
+			return userFaker.CreateMany(5), 5, nil
 		},
 	}
 }
