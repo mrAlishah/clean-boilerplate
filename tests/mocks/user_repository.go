@@ -1,6 +1,7 @@
 package mocks
 
 import (
+	"boilerplate/core/infrastructures"
 	"boilerplate/core/models"
 	"boilerplate/core/utils"
 )
@@ -41,4 +42,23 @@ func (r *UserRepository) UpdateColumn(user *models.User, column string, value in
 
 func (r *UserRepository) DeleteUser(id uint64) (err error) {
 	return r.DeleteUserFn(id)
+}
+
+func NewUserRepository() UserRepository {
+	env := infrastructures.NewEnv()
+	logger := infrastructures.NewLogger(env)
+	encryption := infrastructures.NewEncryption(logger, env)
+	return UserRepository{
+		CreateFn: func(user *models.User) error {
+			return nil
+		},
+		FindByFieldFn: func(field string, value interface{}) (user models.User, err error) {
+			return models.User{
+				FirstName: "dgsgd",
+				LastName:  "dsgdssdg",
+				Email:     "mahdi@gmail.com",
+				Password:  encryption.SaltAndSha256Encrypt("m1234567", "m12345567"),
+			}, err
+		},
+	}
 }
