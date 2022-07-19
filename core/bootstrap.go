@@ -4,8 +4,11 @@ import (
 	"boilerplate/core/infrastructures"
 	"boilerplate/core/responses"
 	"boilerplate/core/responses/validators"
+	"boilerplate/docs"
 	"context"
 	"fmt"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"net/http"
 	"runtime"
 
@@ -62,11 +65,12 @@ func bootstrap(lifecycle fx.Lifecycle,
 			logger.Info("------------------------")
 			logger.Info(fmt.Sprintf("------ %s  ------", env.AppName))
 			logger.Info("------------------------")
+			fmt.Println(env.ServerPort)
 			go func() {
 				validators.Setup()
+				docs.SwaggerInfo.BasePath = "/api"
 				routes.Setup()
-				//docs.SwaggerInfo.BasePath = "/api"
-				//router.Gin.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+				router.Gin.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 				//middlewares.Setup()
 				if env.ServerPort == "" {

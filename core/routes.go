@@ -1,6 +1,7 @@
 package core
 
 import (
+	genericApp "boilerplate/apps/generic"
 	"boilerplate/apps/user"
 	"go.uber.org/fx"
 )
@@ -9,6 +10,7 @@ import (
 var RoutesModule = fx.Options(
 	fx.Provide(NewRoutes),
 	fx.Provide(user.NewUserRoutes),
+	fx.Provide(genericApp.NewGenericRoutes),
 )
 
 // Routes contains multiple routes
@@ -22,9 +24,11 @@ type Route interface {
 // NewRoutes sets up routes
 func NewRoutes(
 	userRoutes user.UserRoutes,
+	genericRoutes genericApp.GenericRoutes,
 ) Routes {
 	return Routes{
 		userRoutes,
+		genericRoutes,
 	}
 }
 

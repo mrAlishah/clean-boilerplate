@@ -39,7 +39,7 @@ func (e Encryption) Sha256Encrypt(password string) string {
 	return encodedStr
 }
 
-func (e Encryption) SaltAndSha256Encrypt(password string) string {
-	password = e.SaltPassword(password, "")
+func (e Encryption) SaltAndSha256Encrypt(password string, salt string) string {
+	password = e.SaltPassword(password, salt)
 	return e.Sha256Encrypt(password)
 }

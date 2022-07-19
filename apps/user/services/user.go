@@ -1,6 +1,7 @@
 package services
 
 import (
+	"boilerplate/apps/user/DTO"
 	repositories "boilerplate/apps/user/repositories/gorm"
 	errors2 "boilerplate/core/errors"
 	"boilerplate/core/infrastructures"
@@ -12,14 +13,13 @@ import (
 
 // UserService -> struct
 type UserService struct {
-	userRepository *repositories.UserRepository
+	userRepository interfaces.UserRepository
 	db             *infrastructures.GormDB
 	logger         interfaces.Logger
 	encryption     *infrastructures.Encryption
 }
 
-// NewUserService -> creates a new Userservice
-func NewUserService(userRepository *repositories.UserRepository,
+func NewUserService(userRepository interfaces.UserRepository,
 	db *infrastructures.GormDB, logger *infrastructures.Logger,
 	encryption *infrastructures.Encryption) *UserService {
 	return &UserService{
@@ -28,6 +28,13 @@ func NewUserService(userRepository *repositories.UserRepository,
 		logger:         logger,
 		encryption:     encryption,
 	}
+}
+
+// FxNewUserService -> creates a new Userservice
+func FxNewUserService(userRepository *repositories.UserRepository,
+	db *infrastructures.GormDB, logger *infrastructures.Logger,
+	encryption *infrastructures.Encryption) *UserService {
+	return NewUserService(userRepository, db, logger, encryption)
 }
 
 // GetAllUser -> call to get all the User
@@ -40,8 +47,8 @@ func (s UserService) GetAllUsers(pagination utils.Pagination) (users []models.Us
 	return
 }
 
-func (s UserService) CreateUser(userData models.CreateUserRequestAdmin) (err error) {
-	encryptedPassword := s.encryption.SaltAndSha256Encrypt(userData.Password)
+func (s UserService) CreateUser(userData DTO.CreateUserRequestAdmin) (err error) {
+	encryptedPassword := s.encryption.SaltAndSha256Encrypt(userData.Password, userData.Email)
 	user := models.User{
 		Password:  encryptedPassword,
 		FirstName: userData.FirstName,
@@ -57,9 +64,10 @@ func (s UserService) CreateUser(userData models.CreateUserRequestAdmin) (err err
 }
 
 func (s UserService) DeleteUser(id uint64) (err error) {
-	err = s.userRepository.DeleteUser(id)
+	err = s.userRepository.DeleteByID(uint(id))
 	if !errors.Is(err, errors2.NotFoundError) && err != nil {
 		s.logger.Fatal("Failed to find user:%s", err.Error())
+		return err
 	}
 	return err
 }

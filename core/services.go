@@ -6,5 +6,6 @@ import (
 )
 
 var ServiceModule = fx.Options(
-	fx.Provide(services.NewUserService),
+	fx.Provide(services.FxNewUserService),
+	fx.Provide(services.NewAuthService),
 )

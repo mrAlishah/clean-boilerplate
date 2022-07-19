@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	errors2 "boilerplate/core/errors"
 	"boilerplate/core/infrastructures"
 	"boilerplate/core/models"
 	"boilerplate/core/utils"
@@ -74,18 +73,4 @@ func (r UserRepository) GetAllUsers(pagination utils.Pagination) ([]models.User,
 //update a single column by user model
 func (r UserRepository) UpdateColumn(user *models.User, column string, value interface{}) error {
 	return r.db.DB.Model(user).Update(column, value).Error
-}
-
-func (r UserRepository) DeleteUser(id uint64) (err error) {
-	_, err = r.FindByField("id", id)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		err = errors2.NotFoundError
-		return
-	}
-	if err != nil {
-		return
-	}
-
-	err = r.DeleteByID(uint(id))
-	return
 }

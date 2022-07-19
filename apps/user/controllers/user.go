@@ -1,15 +1,15 @@
 package controllers
 
 import (
+	"boilerplate/apps/user/DTO"
 	"boilerplate/apps/user/services"
+	errors2 "boilerplate/core/errors"
 	"boilerplate/core/infrastructures"
 	"boilerplate/core/interfaces"
-	"boilerplate/core/models"
 	"boilerplate/core/responses"
 	"boilerplate/core/utils"
 	"errors"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 )
@@ -62,7 +62,7 @@ func (uc UserController) ListUser(c *gin.Context) {
 // @failure 403 {object} swagger.AccessForbiddenResponse
 // @Router /admin/users [post]
 func (uc UserController) CreateUser(c *gin.Context) {
-	var userData models.CreateUserRequestAdmin
+	var userData DTO.CreateUserRequestAdmin
 	if err := c.ShouldBindJSON(&userData); err != nil {
 		fieldErrors := make(map[string]string, 0)
 		if !utils.IsGoodPassword(userData.Password) {
@@ -107,7 +107,7 @@ func (uc UserController) DeleteUser(c *gin.Context) {
 	}
 
 	err = uc.userService.DeleteUser(uint64(id))
-	if errors.Is(err, gorm.ErrRecordNotFound) {
+	if errors.Is(err, errors2.NotFoundError) {
 		responses.ErrorJSON(c, http.StatusNotFound, gin.H{}, "No user found")
 		return
 	}
