@@ -1,7 +1,6 @@
-package utils
+package infrastructures
 
 import (
-	"boilerplate/core/infrastructures"
 	gormLogger "gorm.io/gorm/logger"
 	"log"
 	"os"
@@ -9,13 +8,13 @@ import (
 )
 
 //get env for no fx dependency injection environment
-func GetEnv() *infrastructures.Env {
-	return infrastructures.NewEnv()
+func GetEnv() *Env {
+	return NewEnv()
 }
 
 //get db for no fx dependency injection environment
-func GetDB(env *infrastructures.Env) *infrastructures.GormDB {
-	logger := infrastructures.NewLogger(env)
+func GetDBNoFX(env *Env) *GormDB {
+	logger := NewLogger(env)
 	gLogger := gormLogger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 		gormLogger.Config{
@@ -24,5 +23,5 @@ func GetDB(env *infrastructures.Env) *infrastructures.GormDB {
 			Colorful:      true,            // Disable color
 		},
 	)
-	return infrastructures.GetDB(gLogger, logger, env)
+	return GetDB(gLogger, logger, env)
 }

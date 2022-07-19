@@ -37,6 +37,7 @@ func (pr UserRoutes) Setup() {
 		g.GET("/", pr.userController.ListUser)
 		g.POST("/", pr.userController.CreateUser)
 		g.DELETE("/:id", pr.userController.DeleteUser)
+		g.PUT("/:id", pr.userController.UpdateUser)
 	}
 
 	a := pr.router.Gin.Group("/api/auth")

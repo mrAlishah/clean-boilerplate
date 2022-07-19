@@ -12,4 +12,5 @@ type UserRepository interface {
 	IsExist(field string, value string) (bool, error)
 	GetAllUsers(pagination utils.Pagination) ([]models.User, int64, error)
 	UpdateColumn(user *models.User, column string, value interface{}) error
+	UpdateModel(user *models.User, id uint64) error
 }

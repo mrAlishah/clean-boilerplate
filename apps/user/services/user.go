@@ -71,3 +71,25 @@ func (s UserService) DeleteUser(id uint64) (err error) {
 	}
 	return err
 }
+
+func (s UserService) UpdateUser(userData DTO.UpdateUserRequestAdmin, userID uint64) (user models.User, err error) {
+	userData.ToModel(&user)
+	err = s.userRepository.UpdateModel(&user, userID)
+	if !errors.Is(err, errors2.NotFoundError) && err != nil {
+		s.logger.Fatal("Failed to find user:%s", err.Error())
+		return
+	}
+	if err != nil {
+		s.logger.Fatal("Failed to update user:%s", err.Error())
+		return
+	}
+	return
+}
+
+func (s UserService) DetailUser(id uint64) (user models.User, err error) {
+	user, err = s.userRepository.FindByField("id", uint(id))
+	if !errors.Is(err, errors2.NotFoundError) && err != nil {
+		s.logger.Fatal("Failed to find user:%s", err.Error())
+	}
+	return
+}
