@@ -74,3 +74,7 @@ func (r UserRepository) GetAllUsers(pagination utils.Pagination) ([]models.User,
 func (r UserRepository) UpdateColumn(user *models.User, column string, value interface{}) error {
 	return r.db.DB.Model(user).Update(column, value).Error
 }
+
+func (r UserRepository) UpdateModel(user *models.User, id uint64) error {
+	return r.db.DB.Where("id=?", id).Updates(&user).Error
+}

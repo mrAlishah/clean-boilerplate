@@ -119,6 +119,31 @@ func (uc UserController) DeleteUser(c *gin.Context) {
 	uc.paginateUserList(c, "User deleted successfully !")
 }
 
+func (uc UserController) UpdateUser(c *gin.Context) {
+	var userData DTO.UpdateUserRequestAdmin
+	if err := c.ShouldBindJSON(&userData); err != nil {
+		responses.ValidationErrorsJSON(c, err, "", map[string]string{})
+		return
+	}
+
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		responses.ErrorJSON(c, http.StatusNotFound, gin.H{}, "No user found")
+		return
+	}
+	userData.ID = uint64(id)
+
+	_, err = uc.userService.UpdateUser(userData, uint64(id))
+	if errors.Is(err, errors2.NotFoundError) {
+		responses.ErrorJSON(c, http.StatusNotFound, gin.H{}, "No user found")
+		return
+	}
+	if err != nil {
+		responses.ErrorJSON(c, http.StatusInternalServerError, gin.H{}, "Sorry an error occurred!")
+	}
+	uc.detailUser(c, uint64(id))
+}
+
 func (uc *UserController) paginateUserList(c *gin.Context, message string) {
 	pagination := utils.BuildPagination(c)
 	users, count, err := uc.userService.GetAllUsers(pagination)
@@ -130,4 +155,19 @@ func (uc *UserController) paginateUserList(c *gin.Context, message string) {
 		"users": users,
 		"count": count,
 	}, message)
+}
+
+func (uc *UserController) detailUser(c *gin.Context, id uint64) {
+	user, err := uc.userService.DetailUser(id)
+	if errors.Is(err, errors2.NotFoundError) {
+		responses.ErrorJSON(c, http.StatusNotFound, gin.H{}, "No user found")
+		return
+	}
+	if err != nil {
+		responses.ErrorJSON(c, http.StatusInternalServerError, gin.H{}, "Sorry an error occurred!")
+		return
+	}
+	var userResponse DTO.UserResponse
+	userResponse.FromModel(user)
+	responses.JSON(c, http.StatusOK, userResponse, "")
 }

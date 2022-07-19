@@ -28,7 +28,6 @@ type UserResponse struct {
 	Email     string `json:"email"`
 	FirstName string `json:"firstName" binding:"required"`
 	LastName  string `json:"lastName" binding:"required"`
-	Password  string `json:"-"`
 }
 
 func (r *UserResponse) FromModel(userModel models.User) {
@@ -38,14 +37,13 @@ func (r *UserResponse) FromModel(userModel models.User) {
 	r.Email = userModel.Email
 	r.FirstName = userModel.FirstName
 	r.LastName = userModel.LastName
-	r.Password = userModel.Password
 }
 
-func (r *RegisterRequest) ToModel(encryption infrastructures.Encryption, m models.User) {
-	r.Email = m.Email
-	r.FirstName = m.FirstName
-	r.LastName = m.LastName
-	r.Password = encryption.SaltAndSha256Encrypt(m.Password, m.Email)
+func (r *RegisterRequest) ToModel(encryption infrastructures.Encryption, m *models.User) {
+	m.Email = r.Email
+	m.FirstName = r.FirstName
+	m.LastName = r.LastName
+	m.Password = encryption.SaltAndSha256Encrypt(r.Password, r.Email)
 }
 
 type CreateUserRequestAdmin struct {
@@ -54,4 +52,17 @@ type CreateUserRequestAdmin struct {
 	LastName       string `json:"lastName" binding:"required"`
 	Password       string `json:"password" binding:"required"`
 	RepeatPassword string `json:"repeatPassword" binding:"required,eqfield=Password"`
+}
+
+type UpdateUserRequestAdmin struct {
+	Email     string `json:"email" binding:"required,uniqueGorm=users&email,email"`
+	FirstName string `json:"firstName" binding:"required"`
+	LastName  string `json:"lastName" binding:"required"`
+	ID        uint64 `json:"id"`
+}
+
+func (r *UpdateUserRequestAdmin) ToModel(m *models.User) {
+	m.Email = r.Email
+	m.FirstName = r.FirstName
+	m.LastName = r.LastName
 }
