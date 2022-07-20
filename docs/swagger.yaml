@@ -285,6 +285,38 @@ paths:
       summary: delete user
       tags:
       - admin
+    get:
+      consumes:
+      - application/json
+      description: detail user or admin
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/swagger.SingleUserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/swagger.UnauthenticatedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/swagger.AccessForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/swagger.NotFoundResponse'
+      summary: detail user
+      tags:
+      - user
     put:
       consumes:
       - application/json
