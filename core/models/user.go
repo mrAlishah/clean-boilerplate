@@ -6,6 +6,7 @@ type User struct {
 	FirstName string `json:"firstName" binding:"required"`
 	LastName  string `json:"lastName" binding:"required"`
 	Password  string `json:"password" binding:"required"`
+	IsAdmin   string `json:"isAdmin" binding:"required"`
 }
 
 // TableName gives table name of model
