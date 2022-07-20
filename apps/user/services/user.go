@@ -66,9 +66,8 @@ func (s UserService) DeleteUser(id uint64) (err error) {
 	err = s.userRepository.DeleteByID(uint(id))
 	if !errors.Is(err, errors2.NotFoundError) && err != nil {
 		s.logger.Fatal("Failed to find user:%s", err.Error())
-		return err
 	}
-	return err
+	return
 }
 
 func (s UserService) UpdateUser(userData DTO.UpdateUserRequestAdmin, userID uint64) (user models.User, err error) {

@@ -37,10 +37,21 @@ func (r UserRepository) FindByField(field string, value interface{}) (user model
 	return
 }
 
-func (r UserRepository) DeleteByID(id uint) error {
-	user := models.User{}
-	r.db.DB.Where("id=?", id).First(&user)
-	return r.db.DB.Delete(&user).Error
+func (r UserRepository) DeleteByID(id uint) (err error) {
+	var user models.User
+	err = r.db.DB.Where("id=?", id).First(&user).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		err = errors2.NotFoundError
+		return
+	}
+	if err != nil {
+		return
+	}
+	err = r.db.DB.Where("id=?", id).Delete(&user).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		err = errors2.NotFoundError
+	}
+	return
 }
 
 func (r UserRepository) IsExist(field string, value string) (bool, error) {
