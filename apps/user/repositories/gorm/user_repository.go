@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	errors2 "boilerplate/core/errors"
 	"boilerplate/core/infrastructures"
 	"boilerplate/core/models"
 	"boilerplate/core/utils"
@@ -30,6 +31,9 @@ func (r UserRepository) Create(User *models.User) error {
 
 func (r UserRepository) FindByField(field string, value interface{}) (user models.User, err error) {
 	err = r.db.DB.Where(fmt.Sprintf("%s= ?", field), value).First(&user).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		err = errors2.NotFoundError
+	}
 	return
 }
 

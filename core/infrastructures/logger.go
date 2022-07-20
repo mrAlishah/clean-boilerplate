@@ -22,7 +22,7 @@ func (l *Logger) Warning(msg string, parameters ...interface{}) {
 }
 
 func (l *Logger) Fatal(msg string, parameters ...interface{}) {
-	l.Zap.Fatalf(msg, parameters...)
+	l.Zap.Errorf(msg, parameters...)
 }
 
 // NewLogger sets up logger
