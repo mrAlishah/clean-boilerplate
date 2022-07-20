@@ -82,6 +82,7 @@ func (uc UserController) CreateUser(c *gin.Context) {
 	err := uc.userService.CreateUser(userData)
 	if err != nil {
 		responses.ErrorJSON(c, http.StatusInternalServerError, gin.H{}, "Sorry an error occurred!")
+		return
 	}
 	uc.paginateUserList(c, "User created successfully.")
 }

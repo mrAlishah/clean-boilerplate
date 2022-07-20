@@ -58,7 +58,6 @@ func (s UserService) CreateUser(userData DTO.CreateUserRequestAdmin) (err error)
 	err = s.userRepository.Create(&user)
 	if err != nil {
 		s.logger.Fatal("Failed to create user:%s", err.Error())
-		return
 	}
 	return
 }
