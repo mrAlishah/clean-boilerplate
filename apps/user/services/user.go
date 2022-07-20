@@ -90,7 +90,6 @@ func (s UserService) DetailUser(id uint64) (user models.User, err error) {
 	user, err = s.userRepository.FindByField("id", uint(id))
 	if !errors.Is(err, errors2.NotFoundError) && err != nil {
 		s.logger.Fatal("Failed to find user:%s", err.Error())
-		return
 	}
 	return
 }
