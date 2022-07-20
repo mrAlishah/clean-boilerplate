@@ -9,6 +9,7 @@ import (
 	"boilerplate/core/models"
 	"boilerplate/core/utils"
 	"errors"
+	"github.com/gin-gonic/gin"
 )
 
 // UserService -> struct
@@ -90,4 +91,10 @@ func (s UserService) DetailUser(id uint64) (user models.User, err error) {
 		s.logger.Fatal("Failed to find user:%s", err.Error())
 	}
 	return
+}
+
+//get authenticated user
+func (s UserService) GetAuthenticatedUser(c *gin.Context) (models.User, error) {
+	userId := c.MustGet("userId").(string)
+	return s.userRepository.FindByField("id=?", userId)
 }
