@@ -1,33 +1,33 @@
 package middlewares
 
 import (
-	"cotchciti/apps/authApp/services"
-	"cotchciti/apps/userApp/repositories"
-	"cotchciti/core/infrastructure"
-	"cotchciti/core/responses"
+	repositories2 "boilerplate/apps/user/repositories/gorm"
+	services2 "boilerplate/apps/user/services"
+	"boilerplate/core/infrastructures"
+	"boilerplate/core/interfaces"
+	"boilerplate/core/responses"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 	"strings"
-
-	"github.com/gin-gonic/gin"
 )
 
 //AuthMiddleware -> struct for transaction
 type AuthMiddleware struct {
-	logger         infrastructure.Logger
-	authService    services.AuthService
-	env            infrastructure.Env
-	userRepository repositories.UserRepository
+	logger         interfaces.Logger
+	authService    *services2.AuthService
+	env            *infrastructures.Env
+	userRepository *repositories2.UserRepository
 }
 
 //NewAuthMiddleware -> new instance of transaction
 func NewAuthMiddleware(
-	logger infrastructure.Logger,
-	authService services.AuthService,
-	env infrastructure.Env,
-	userRepository repositories.UserRepository,
-) AuthMiddleware {
-	return AuthMiddleware{
+	logger *infrastructures.Logger,
+	authService *services2.AuthService,
+	env *infrastructures.Env,
+	userRepository *repositories2.UserRepository,
+) *AuthMiddleware {
+	return &AuthMiddleware{
 		authService:    authService,
 		logger:         logger,
 		env:            env,
@@ -39,8 +39,8 @@ type authHeader struct {
 	Authorization string `header:"Authorization"`
 }
 
-func (m AuthMiddleware) AuthHandle() gin.HandlerFunc {
-	m.logger.Zap.Info("setting up auth middleware")
+func (m *AuthMiddleware) AuthHandle() gin.HandlerFunc {
+	m.logger.Info("setting up auth middleware")
 
 	return func(c *gin.Context) {
 		ah := authHeader{}
@@ -53,7 +53,7 @@ func (m AuthMiddleware) AuthHandle() gin.HandlerFunc {
 				return
 			}
 			accessToken := strs[1]
-			valid, claims, _ := services.DecodeToken(accessToken, "access"+m.env.Secret)
+			valid, claims, _ := m.authService.DecodeToken(accessToken, "access"+m.env.Secret)
 
 			id, ok := claims["userId"].(float64)
 			if ok {

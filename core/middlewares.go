@@ -2,7 +2,7 @@ package core
 
 import (
 	adminMiddlewares "boilerplate/apps/admin/middlewares"
-	"boilerplate/apps/generic/middlewares"
+	"boilerplate/apps/user/middlewares"
 	"go.uber.org/fx"
 )
 
