@@ -56,7 +56,6 @@ func (uc UserController) ListUser(c *gin.Context) {
 // @Param repeatPassword formData string true "repeatPassword that have at least 8 length and contain an alphabet and number "
 // @Param firstName formData string true "firstName"
 // @Param lastName formData string true "lastName"
-// @Param isAdmin formData bool true "isAdmin"
 // @Success 200 {object} swagger.UsersListResponse
 // @failure 401 {object} swagger.UnauthenticatedResponse
 // @failure 403 {object} swagger.AccessForbiddenResponse
@@ -83,6 +82,7 @@ func (uc UserController) CreateUser(c *gin.Context) {
 	err := uc.userService.CreateUser(userData)
 	if err != nil {
 		responses.ErrorJSON(c, http.StatusInternalServerError, gin.H{}, "Sorry an error occurred!")
+		return
 	}
 	uc.paginateUserList(c, "User created successfully.")
 }
@@ -119,6 +119,23 @@ func (uc UserController) DeleteUser(c *gin.Context) {
 	uc.paginateUserList(c, "User deleted successfully !")
 }
 
+// @Summary update user
+// @Schemes
+// @Description update user or admin , admin only
+// @Tags admin
+// @Accept json
+// @Produce json
+// @Param id path int true "user id"
+// @Param email formData string true "unique email"
+// @Param password formData string true "password that have at least 8 length and contain an alphabet and number "
+// @Param repeatPassword formData string true "repeatPassword that have at least 8 length and contain an alphabet and number "
+// @Param firstName formData string true "firstName"
+// @Param lastName formData string true "lastName"
+// @Success 200 {object} swagger.SingleUserResponse
+// @failure 401 {object} swagger.UnauthenticatedResponse
+// @failure 404 {object} swagger.NotFoundResponse
+// @failure 403 {object} swagger.AccessForbiddenResponse
+// @Router /admin/users/{id} [put]
 func (uc UserController) UpdateUser(c *gin.Context) {
 	var userData DTO.UpdateUserRequestAdmin
 	if err := c.ShouldBindJSON(&userData); err != nil {
@@ -141,6 +158,28 @@ func (uc UserController) UpdateUser(c *gin.Context) {
 	if err != nil {
 		responses.ErrorJSON(c, http.StatusInternalServerError, gin.H{}, "Sorry an error occurred!")
 	}
+	uc.detailUser(c, uint64(id))
+}
+
+// @Summary detail user
+// @Schemes
+// @Description detail user or admin
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param id path int true "user id"
+// @Success 200 {object} swagger.SingleUserResponse
+// @failure 401 {object} swagger.UnauthenticatedResponse
+// @failure 404 {object} swagger.NotFoundResponse
+// @failure 403 {object} swagger.AccessForbiddenResponse
+// @Router /admin/users/{id} [get]
+func (uc UserController) DetailUser(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		responses.ErrorJSON(c, http.StatusNotFound, gin.H{}, "No user found")
+		return
+	}
+
 	uc.detailUser(c, uint64(id))
 }
 

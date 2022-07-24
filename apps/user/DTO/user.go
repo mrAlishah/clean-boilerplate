@@ -26,8 +26,9 @@ type RegisterRequest struct {
 type UserResponse struct {
 	models.BaseResponse
 	Email     string `json:"email"`
-	FirstName string `json:"firstName" binding:"required"`
-	LastName  string `json:"lastName" binding:"required"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	IsAdmin   bool   `json:"isAdmin"`
 }
 
 func (r *UserResponse) FromModel(userModel models.User) {
@@ -37,6 +38,7 @@ func (r *UserResponse) FromModel(userModel models.User) {
 	r.Email = userModel.Email
 	r.FirstName = userModel.FirstName
 	r.LastName = userModel.LastName
+	r.IsAdmin = userModel.IsAdmin
 }
 
 func (r *RegisterRequest) ToModel(encryption infrastructures.Encryption, m *models.User) {
@@ -52,12 +54,14 @@ type CreateUserRequestAdmin struct {
 	LastName       string `json:"lastName" binding:"required"`
 	Password       string `json:"password" binding:"required"`
 	RepeatPassword string `json:"repeatPassword" binding:"required,eqfield=Password"`
+	IsAdmin        bool   `json:"isAdmin" binding:"required"`
 }
 
 type UpdateUserRequestAdmin struct {
 	Email     string `json:"email" binding:"required,uniqueGorm=users&email,email"`
 	FirstName string `json:"firstName" binding:"required"`
 	LastName  string `json:"lastName" binding:"required"`
+	IsAdmin   bool   `json:"isAdmin" binding:"required"`
 	ID        uint64 `json:"id"`
 }
 
@@ -65,4 +69,5 @@ func (r *UpdateUserRequestAdmin) ToModel(m *models.User) {
 	m.Email = r.Email
 	m.FirstName = r.FirstName
 	m.LastName = r.LastName
+	m.IsAdmin = r.IsAdmin
 }

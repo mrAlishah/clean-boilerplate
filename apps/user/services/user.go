@@ -9,6 +9,7 @@ import (
 	"boilerplate/core/models"
 	"boilerplate/core/utils"
 	"errors"
+	"github.com/gin-gonic/gin"
 )
 
 // UserService -> struct
@@ -58,7 +59,6 @@ func (s UserService) CreateUser(userData DTO.CreateUserRequestAdmin) (err error)
 	err = s.userRepository.Create(&user)
 	if err != nil {
 		s.logger.Fatal("Failed to create user:%s", err.Error())
-		return
 	}
 	return
 }
@@ -67,9 +67,8 @@ func (s UserService) DeleteUser(id uint64) (err error) {
 	err = s.userRepository.DeleteByID(uint(id))
 	if !errors.Is(err, errors2.NotFoundError) && err != nil {
 		s.logger.Fatal("Failed to find user:%s", err.Error())
-		return err
 	}
-	return err
+	return
 }
 
 func (s UserService) UpdateUser(userData DTO.UpdateUserRequestAdmin, userID uint64) (user models.User, err error) {
@@ -92,4 +91,13 @@ func (s UserService) DetailUser(id uint64) (user models.User, err error) {
 		s.logger.Fatal("Failed to find user:%s", err.Error())
 	}
 	return
+}
+
+//get authenticated user
+func (s UserService) GetAuthenticatedUser(c *gin.Context) (models.User, error) {
+	userId := c.MustGet("userId").(string)
+	if userId == "" {
+		return models.User{}, errors.New("user didn't logged in")
+	}
+	return s.userRepository.FindByField("id", userId)
 }
