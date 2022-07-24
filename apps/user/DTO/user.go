@@ -21,7 +21,6 @@ type RegisterRequest struct {
 	LastName       string `json:"lastName" binding:"required"`
 	Password       string `json:"password" binding:"required"`
 	RepeatPassword string `json:"repeatPassword" binding:"required,eqfield=Password"`
-	IsAdmin        bool   `json:"isAdmin" binding:"required"`
 }
 
 type UserResponse struct {
@@ -46,7 +45,6 @@ func (r *RegisterRequest) ToModel(encryption infrastructures.Encryption, m *mode
 	m.Email = r.Email
 	m.FirstName = r.FirstName
 	m.LastName = r.LastName
-	m.IsAdmin = r.IsAdmin
 	m.Password = encryption.SaltAndSha256Encrypt(r.Password, r.Email)
 }
 
