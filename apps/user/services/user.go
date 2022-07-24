@@ -96,5 +96,8 @@ func (s UserService) DetailUser(id uint64) (user models.User, err error) {
 //get authenticated user
 func (s UserService) GetAuthenticatedUser(c *gin.Context) (models.User, error) {
 	userId := c.MustGet("userId").(string)
-	return s.userRepository.FindByField("id=?", userId)
+	if userId == "" {
+		return models.User{}, errors.New("user didn't logged in")
+	}
+	return s.userRepository.FindByField("id", userId)
 }
