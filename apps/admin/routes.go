@@ -37,7 +37,8 @@ func NewAdminRoutes(
 
 //Setup -> sets up route for util entities
 func (pr AdminRoutes) Setup() {
-	g := pr.router.Gin.Group("/api/admin/users").Use(pr.authMiddleware.AuthHandle())
+	g := pr.router.Gin.Group("/api/admin/users").
+		Use(pr.authMiddleware.AuthHandle()).Use(pr.adminMiddleware.AdminHandle())
 	{
 		g.GET("/", pr.userController.ListUser)
 		g.POST("/", pr.userController.CreateUser)
