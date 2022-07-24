@@ -58,10 +58,8 @@ func (m *AuthMiddleware) AuthHandle() gin.HandlerFunc {
 			id, ok := claims["userId"].(float64)
 			if ok {
 				userId := strconv.Itoa(int(id))
-				deviceToken := claims["deviceToken"].(string)
 				if valid && err == nil {
 					c.Set("userId", userId)
-					c.Set("deviceToken", deviceToken)
 					c.Next()
 					return
 				}
